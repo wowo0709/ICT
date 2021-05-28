@@ -4,16 +4,15 @@ import sys
 import numpy as np
 import cv2 as cv
 import time
-import threading
+# import threading
 
 from PyQt5.QtCore import QSize,Qt,QThread,QTimer, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import *
 from PyQt5 import uic
 from PyQt5.QtGui import *
-import piexif
+# import piexif
 
-from multiprocessing import Process
-from threading import Thread
+# from threading import Thread
 # ===========================================================================================
 
 mainScreen = uic.loadUiType("MainScreen.ui")[0]
@@ -85,7 +84,11 @@ class MainScreen(QMainWindow, mainScreen):
         # modeSelcCombobox에 아이템 추가
         self.setup_modeSelcCombobox(self.modeSelcCombobox)
 
-        '''버튼에 기능을 연결하는 코드'''
+        '''콤보박스에 함수를 연결하는 코드'''
+        self.camSelcCombobox.currentIndexChanged.connect(self.camSelcComboboxChanged)
+        self.modeSelcCombobox.currentIndexChanged.connect(self.modeSelcComboboxChanged)
+
+        '''버튼에 함수를 연결하는 코드'''
         # 재생/멈춤 버튼
         self.playerBtn.clicked.connect(self.playerBtnClicked)
         # 사운드 버튼
@@ -93,12 +96,14 @@ class MainScreen(QMainWindow, mainScreen):
         # 설정 버튼
         self.optionBtn.clicked.connect(self.optionBtnClicked)
 
+        
+
         '''스레드 관련 코드'''
         # 캠 스레드 4개 생성
         self.cam = [0,0,0,0]
         for i in range(4):
             self.cam[i] = VideoThread()
-
+        # 스레드에 이미지뷰 할당
         self.frame = {self.cam[0]:self.camView1,
                     self.cam[1]:self.camView2,
                     self.cam[2]:self.camView3,
@@ -125,26 +130,34 @@ class MainScreen(QMainWindow, mainScreen):
         combobox.addItem("night mode")
         combobox.addItem("auto mode")
 
+    '''콤보박스 선택 아이템 변경 메서드'''
+    def camSelcComboboxChanged(self):
+        # TODO: 카메라 선택 콤보박스 아이템 변경 시의 동작
+        pass
+
+    def modeSelcComboboxChanged(self):
+        # TODO: 모드 선택 콤보박스 아이템 변경 시의 동작
+        pass
+
     '''버튼 클릭 메서드'''
     def playerBtnClicked(self):
         # TODO: 재생 버튼 클릭 시의 동작
-        raise Exception.implementationError
+        pass
     def soundBtnClicked(self):
         # TODO: 사운드 버튼 클릭 시의 동작
-        raise Exception.implementationError
+        pass
     def optionBtnClicked(self) :
         self.optionScreen = OptionScreen()
         self.optionScreen.exec_()
 
     '''스레드 관련 메서드'''
-
-
     # 각 캠 스레드에서 출력될 비디오 할당
     def setVideo2Thread(self):
-        self.cam[0].setFilename("sample_video/lol03_40ms_wind.mp4")
-        self.cam[1].setFilename("sample_video/lol04_60ms_wind.mp4")
-        self.cam[2].setFilename("sample_video/lol05_80ms_wind.mp4")
-        self.cam[3].setFilename("sample_video/Sample MP4 Video File for Testing.mp4")
+        # TODO: 캠 연결
+        self.cam[0].setFilename("sample_video/1_Thunder.mp4")
+        self.cam[1].setFilename("sample_video/1_Vibration.mp4")
+        self.cam[2].setFilename("sample_video/2_Wind.mp4")
+        self.cam[3].setFilename("sample_video/2_Vibration.mp4")
 
     def startThread(self):
         for i in range(4):
@@ -152,29 +165,28 @@ class MainScreen(QMainWindow, mainScreen):
             self.cam[i].start()
 
     @pyqtSlot(QThread,np.ndarray)
+    # 이미지 뷰어를 새로운 이미지로 업데이트
     def update_image(self,thread,cv_img):
-        # 이미지 뷰어를 새로운 이미지로 업데이트
         qt_img = self.convert_cv_qt(cv_img)
         self.frame[thread].setPixmap(qt_img)
-        # frame.setPixmap(qt_img)
-        # self.camView1.setPixmap(qt_img)
-        # self.camView2.setPixmap(qt_img)
-        # self.camView3.setPixmap(qt_img)
-        # self.camView4.setPixmap(qt_img)
 
-    def convert_cv_qt(self,cv_img):
-        # opencv 이미지에서 QPixmap 이미지로 변환
-        gray_image = cv.cvtColor(cv_img,cv.COLOR_BGR2GRAY)
-        # print(rgb_image.shape)
-        # 높이, 너비 값 가져오기
-        h,w = gray_image.shape
-        #bytes_per_line = ch*w
-        # opencv 이미지를 QImage로 변환
-        convert_to_Qt_format = QImage(gray_image,w,h,QImage.Format_Grayscale8)
-        # 동영상 스케일 조정
-        p = convert_to_Qt_format.scaled(self.display_width,self.display_height,Qt.KeepAspectRatio)
+    # Opencv 이미지에서 QPixmap 이미지로 변환
+    def convert_cv_qt(self,cvImg):
+        height, width, channel = cvImg.shape
+        convert_to_Qt_format = QImage(cvImg.data, width, height, QImage.Format_RGB888)
+        qImg = convert_to_Qt_format.scaled(self.display_width,self.display_height,Qt.KeepAspectRatio)
+        return QPixmap.fromImage(qImg)
+        # gray_image = cv.cvtColor(cv_img,cv.COLOR_BGR2GRAY)
+        # # print(rgb_image.shape)
+        # # 높이, 너비 값 가져오기
+        # h,w = gray_image.shape
+        # #bytes_per_line = ch*w
+        # # opencv 이미지를 QImage로 변환
+        # convert_to_Qt_format = QImage(gray_image,w,h,QImage.Format_Grayscale8)
+        # # 동영상 스케일 조정
+        # p = convert_to_Qt_format.scaled(self.display_width,self.display_height,Qt.KeepAspectRatio)
 
-        return QPixmap.fromImage(p)
+        # return QPixmap.fromImage(p)
 
     def closeEvent(self,event):
         for i in range(4):
