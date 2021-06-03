@@ -96,8 +96,22 @@ class MainScreen(QMainWindow, mainScreen):
         # 설정 버튼
         self.optionBtn.clicked.connect(self.optionBtnClicked)
 
+        self.cam1Btn.clicked.connect(self.cam1BtnClicked)
+        self.cam2Btn.clicked.connect(self.cam2BtnClicked)
+        self.cam3Btn.clicked.connect(self.cam3BtnClicked)
+        self.cam4Btn.clicked.connect(self.cam4BtnClicked)
         
+        self.cam1Btn.setFlat(True)
+        self.cam2Btn.setFlat(True)
+        self.cam3Btn.setFlat(True)
+        self.cam4Btn.setFlat(True)
 
+        self.zoomFrame.hide()
+
+        #self.zoomBtn.setEnabled(False)
+        #self.zoomBtn.setFlat(True)
+# 170 50 901 541
+        
         '''스레드 관련 코드'''
         # 캠 스레드 4개 생성
         self.cam = [0,0,0,0]
@@ -113,10 +127,22 @@ class MainScreen(QMainWindow, mainScreen):
         self.setVideo2Thread()
         # 캠 스레드 시작 (캠 출력 시작)
         self.startThread()
+        
         # 비디오 출력 화면 크기(모든 화면의 크기가 동일하다고 가정)
-        self.display_width = 426
-        self.display_height = 240
+        # self.width = 852
+        # self.height = 480
+        self.width1 = 900
+        self.height1 = 600
 
+        self.width2 = 426
+        self.height2 = 240
+        # self.display_width = 426
+        # self.display_height = 240
+        self.display_width = self.width1
+        self.display_height = self.height1
+        
+        self.prev = self.camView1
+        self.now = None
     '''콤보박스 셋업'''
     def setup_camSelcCombobox(self,combobox):
         combobox.addItem("Main")
@@ -140,6 +166,53 @@ class MainScreen(QMainWindow, mainScreen):
         pass
 
     '''버튼 클릭 메서드'''
+    def cam1BtnClicked(self):
+        self.prev.resize(self.width2,self.height2)
+        self.prev.lower()
+        self.prev = self.now
+        self.now = self.camView1
+        self.camView1.raise_()
+        self.camView1.setGeometry(170,-30,self.width1,self.height1)
+        self.zoomFrame.show()
+        self.zoomBtn.setFlat(True)
+        # self.camView1.resize(self.width1,self.height1)
+    
+    def cam2BtnClicked(self):
+        self.prev.resize(self.width2,self.height2)
+        self.prev.lower()
+        self.prev = self.now
+        self.now = self.camView2
+        self.camView2.raise_()
+        self.camView2.setGeometry(170,-30,self.width1,self.height1)
+        self.zoomFrame.show()
+        self.zoomBtn.setFlat(True)
+        # self.camView2.resize(self.width1,self.height1)
+    
+    def cam3BtnClicked(self):
+        self.prev.resize(self.width2,self.height2)
+        self.prev.lower()
+        self.prev = self.now
+        self.now = self.camView3
+        self.camView3.raise_()
+        self.camView3.setGeometry(170,-30,self.width1,self.height1)
+        self.zoomFrame.show()
+        self.zoomBtn.setFlat(True)
+        # self.camView3.resize(self.width1,self.height1)
+
+    def cam4BtnClicked(self):
+        self.prev.resize(self.width2,self.height2)
+        self.prev.lower()
+        self.prev = self.now
+        self.now = self.camView4
+        self.camView4.raise_()
+        self.camView4.setGeometry(170,-30,self.width1,self.height1)
+        self.zoomFrame.show()
+        self.zoomBtn.setFlat(True)
+        # self.camView4.resize(self.width1,self.height1)
+    
+    def zoomBtn(self):
+        self.frame.hide()
+
     def playerBtnClicked(self):
         # TODO: 재생 버튼 클릭 시의 동작
         pass
@@ -150,7 +223,10 @@ class MainScreen(QMainWindow, mainScreen):
         self.optionScreen = OptionScreen()
         self.optionScreen.exec_()
 
-    '''스레드 관련 메서드'''
+    
+                   
+        
+    # '''스레드 관련 메서드'''
     # 각 캠 스레드에서 출력될 비디오 할당
     def setVideo2Thread(self):
         # TODO: 캠 연결
