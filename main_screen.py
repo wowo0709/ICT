@@ -72,7 +72,32 @@ class OptionScreen(QDialog):
         super(OptionScreen,self).__init__()
         self.ui = uic.loadUi('OptionScreen.ui',self)
 
-        # self.setupUi(self)
+        # modelSelcCombobox에 아이템 추가
+        self.setup_modelSelcCombobox(self.modelSelcCombobox)
+        # IOUCombobox에 아이템 추가
+        self.setup_IOUCombobox(self.IOUCombobox)
+
+        '''콤보박스에 함수를 연결하는 코드'''
+        self.modelSelcCombobox.currentIndexChanged.connect(self.modelSelcComboboxChanged)
+        self.IOUCombobox.currentIndexChanged.connect(self.IOUComboboxChanged)
+
+
+
+    '''콤보박스 셋업'''
+    def setup_modelSelcCombobox(self,combobox):
+        combobox.addItem("Model 1")
+
+    def setup_IOUCombobox(self,combobox):
+        combobox.addItem("0.5")
+
+    '''콤보박스 선택 아이템 변경 메서드'''
+    def modelSelcComboboxChanged(self):
+        # TODO: 카메라 선택 콤보박스 아이템 변경 시의 동작
+        pass
+
+    def IOUComboboxChanged(self):
+        # TODO: 모드 선택 콤보박스 아이템 변경 시의 동작
+        pass
 
 '''메인 스크린'''
 class MainScreen(QMainWindow, mainScreen):
@@ -92,8 +117,10 @@ class MainScreen(QMainWindow, mainScreen):
         '''버튼에 함수를 연결하는 코드'''
         # 재생/멈춤 버튼
         self.playerBtn.clicked.connect(self.playerBtnClicked)
+        self.playerBtnFlag = True
         # 사운드 버튼
         self.soundBtn.clicked.connect(self.soundBtnClicked)
+        self.soundBtnFlag = True
         # 설정 버튼
         self.optionBtn.clicked.connect(self.optionBtnClicked)
 
@@ -202,10 +229,22 @@ class MainScreen(QMainWindow, mainScreen):
         
     def playerBtnClicked(self):
         # TODO: 재생 버튼 클릭 시의 동작
-        pass
+        if self.playerBtnFlag == True:
+            self.playerBtn.setText("||")
+            self.playerBtnFlag = False
+        else:
+            self.playerBtn.setText("▶")
+            self.playerBtnFlag = True
+
     def soundBtnClicked(self):
         # TODO: 사운드 버튼 클릭 시의 동작
-        pass
+        if self.soundBtnFlag == True:
+            self.soundBtn.setText("Sound OFF")
+            self.soundBtnFlag = False
+        else:
+            self.soundBtn.setText("Sound ON")
+            self.soundBtnFlag = True
+
     def optionBtnClicked(self) :
         self.optionScreen = OptionScreen()
         self.optionScreen.exec_()
